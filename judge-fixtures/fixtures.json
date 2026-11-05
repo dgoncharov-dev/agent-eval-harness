@@ -56,7 +56,7 @@
     "expected": { "load_size": "pass", "commitments": "fail", "hazardous": "pass" }
   },
   {
-    "id": "bad-vague-hazard-1",
+    "id": "good-vague-hazard-reminder-1",
     "message": "I've got a bunch of stuff in my garage in Redmond that I need gone. Not sure how to describe it all. What's it going to cost?",
     "quote": {
       "can_serve": true,
@@ -67,10 +67,10 @@
       "needs_photos": true,
       "customer_message": "Thanks for reaching out! We serve Redmond, so we can help. To give you an accurate quote, please send a few photos of the garage contents, ideally one wide shot of the whole pile and a couple of closer ones. Our minimum charge is $99. Once we see the photos, we'll send your firm price. Please don't include any paint, chemicals, propane tanks, batteries, or asbestos, as we can't take those."
     },
-    "expected": { "load_size": "pass", "commitments": "pass", "hazardous": "fail" }
+    "expected": { "load_size": "pass", "commitments": "pass", "hazardous": "pass" }
   },
   {
-    "id": "bad-vague-hazard-2",
+    "id": "good-vague-hazard-reminder-2",
     "message": "I've got a bunch of stuff in my garage in Redmond that I need gone. Not sure how to describe it all. What's it going to cost?",
     "quote": {
       "can_serve": true,
@@ -81,7 +81,7 @@
       "needs_photos": true,
       "customer_message": "Thanks for reaching out! We serve Redmond, so we can help. Since we can't size the load from the description yet, please send a few clear photos of the garage contents (a wide shot of the whole pile plus a couple of close-ups) so we can give you an accurate quote. Our minimum charge is $99. Once we have the photos, we'll send your firm price. Please don't include any paint, chemicals, propane tanks, batteries, or asbestos, as we can't take those."
     },
-    "expected": { "load_size": "pass", "commitments": "pass", "hazardous": "fail" }
+    "expected": { "load_size": "pass", "commitments": "pass", "hazardous": "pass" }
   },
   {
     "id": "bad-underpriced-large",
@@ -180,5 +180,19 @@
       "customer_message": "Thanks for reaching out! Hauling away the old couch and queen mattress from your Kirkland garage would run $120 to $180, and that price is guaranteed and won't change on the day."
     },
     "expected": { "load_size": "pass", "commitments": "fail", "hazardous": "pass" }
+  },
+  {
+    "id": "bad-hazard-unprompted-clear",
+    "message": "Hi, I have an old couch and a queen mattress in my garage in Kirkland. How much to haul them away?",
+    "quote": {
+      "can_serve": true,
+      "items": ["Old couch", "Queen mattress"],
+      "estimated_cubic_yards": 3,
+      "price_low": 120,
+      "price_high": 180,
+      "needs_photos": false,
+      "customer_message": "Thanks for reaching out! Hauling away the old couch and queen mattress would run about $120 to $180. Please don't include any paint, chemicals, propane tanks, batteries or asbestos, as we can't take those."
+    },
+    "expected": { "load_size": "pass", "commitments": "pass", "hazardous": "fail" }
   }
 ]

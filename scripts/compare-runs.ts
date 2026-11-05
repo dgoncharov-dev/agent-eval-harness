@@ -1,25 +1,8 @@
 import { readFile } from "node:fs/promises";
-import { z } from "zod";
-
-const RunFileSchema = z.object({
-  timestamp: z.string(),
-  model: z.string(),
-  repeats: z.number(),
-  cases: z.array(
-    z.object({
-      id: z.string(),
-      attempts: z.array(z.unknown()),
-      outcomes: z.record(z.string(), z.number()),
-    }),
-  ),
-  summary: z.object({ attempts: z.number(), outcomes: z.record(z.string(), z.number()) }),
-});
-type RunFile = z.infer<typeof RunFileSchema>;
+import { parseRunFile, type RunFile } from "../src/harness/reportFile.js";
 
 async function loadRun(path: string): Promise<RunFile> {
-  const parsed = RunFileSchema.safeParse(JSON.parse(await readFile(path, "utf8")));
-  if (!parsed.success) throw new Error(`Invalid results file ${path}:\n${z.prettifyError(parsed.error)}`);
-  return parsed.data;
+  return parseRunFile(JSON.parse(await readFile(path, "utf8")), path);
 }
 
 function rate(passed: number | undefined, attempts: number | undefined): string {

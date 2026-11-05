@@ -20,7 +20,7 @@ describe("judge-fixtures/fixtures.json", () => {
     const parsed = z.array(FixtureSchema).parse(JSON.parse(await readFile(path("../../judge-fixtures/fixtures.json"), "utf8")));
     const caseMessages = new Set((await loadCases(path("../../cases/quotes.json"))).map((c) => c.message));
 
-    expect(parsed).toHaveLength(13);
+    expect(parsed).toHaveLength(14);
     expect(new Set(parsed.map((f) => f.id)).size).toBe(parsed.length);
     for (const fixture of parsed) {
       expect(caseMessages.has(fixture.message), `${fixture.id}: message not found in cases/quotes.json`).toBe(true);

@@ -1,13 +1,15 @@
 import { z } from "zod";
 
+// `reason` comes first in both shapes on purpose: z.toJSONSchema emits properties in this order,
+// so the model writes its reasoning before committing to a verdict or score.
 const GateSchema = z.object({
-  pass: z.boolean(),
   reason: z.string().describe("One sentence explaining the verdict"),
+  pass: z.boolean(),
 });
 
 const QualitySchema = z.object({
-  score: z.literal([1, 2, 3]).describe("3 good, 2 acceptable, 1 poor"),
   reason: z.string().describe("One sentence explaining the score"),
+  score: z.literal([1, 2, 3]).describe("3 good, 2 acceptable, 1 poor"),
 });
 
 export const JudgmentSchema = z.object({

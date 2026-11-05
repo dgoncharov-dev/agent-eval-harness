@@ -1,5 +1,6 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { z } from "zod";
 import { runAllChecks } from "../checks/index.js";
 import type { Case } from "../checks/types.js";
 import { MODELS } from "../config.js";
@@ -88,6 +89,31 @@ describe("JudgmentSchema", () => {
   it("rejects a gate whose pass is not a boolean", () => {
     const bad = { ...goodJudgment, gates: { ...goodJudgment.gates, load_size: { pass: "yes", reason: "x" } } };
     expect(JudgmentSchema.safeParse(bad).success).toBe(false);
+  });
+});
+
+function propertiesOf(node: unknown): object {
+  if (typeof node !== "object" || node === null || !("properties" in node)) throw new Error("schema node has no properties");
+  const { properties } = node;
+  if (typeof properties !== "object" || properties === null) throw new Error("properties is not an object");
+  return properties;
+}
+
+describe("JudgmentSchema JSON schema", () => {
+  const jsonSchema = z.toJSONSchema(JudgmentSchema);
+  const criteria = [
+    ["gates", "load_size", "pass"],
+    ["gates", "commitments", "pass"],
+    ["gates", "hazardous", "pass"],
+    ["quality", "uncertainty_handling", "score"],
+    ["quality", "answers_and_next_step", "score"],
+    ["quality", "tone_brevity", "score"],
+  ] as const;
+
+  it.each(criteria)("lists reason before the verdict for %s.%s", (group, name, verdictKey) => {
+    const groupNode = Reflect.get(propertiesOf(jsonSchema), group);
+    const criterion = Reflect.get(propertiesOf(groupNode), name);
+    expect(Object.keys(propertiesOf(criterion))).toEqual(["reason", verdictKey]);
   });
 });
 
