@@ -23,6 +23,37 @@ if (!parsed.success) {
   process.exit(1);
 }
 
+// Accepts "--only a,b" and "--only=a,b"; returns undefined when the flag is absent.
+function parseOnly(argv: readonly string[]): string[] | undefined {
+  let only: string[] | undefined;
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i] ?? "";
+    const [flag = "", inlineValue] = arg.split("=", 2);
+    if (flag !== "--only") throw new Error(`Unknown argument "${arg}". Supported: --only <id1,id2,...>`);
+    const value = inlineValue ?? argv[++i];
+    const ids = (value ?? "").split(",").map((id) => id.trim()).filter((id) => id !== "");
+    if (ids.length === 0) throw new Error("--only needs at least one fixture id");
+    only = ids;
+  }
+  return only;
+}
+
+let selected = parsed.data;
+try {
+  const only = parseOnly(process.argv.slice(2));
+  if (only) {
+    const known = new Set(parsed.data.map((f) => f.id));
+    const unknown = only.filter((id) => !known.has(id));
+    if (unknown.length > 0) {
+      throw new Error(`Unknown fixture id(s): ${unknown.join(", ")}. Available: ${[...known].join(", ")}`);
+    }
+    selected = parsed.data.filter((f) => only.includes(f.id));
+  }
+} catch (err) {
+  console.error(err instanceof Error ? err.message : String(err));
+  process.exit(1);
+}
+
 let runs = 0;
 let formatFailures = 0;
 // Gate verdicts are only counted for runs that returned a valid judgment.
@@ -31,7 +62,7 @@ let matches = 0;
 let inputTokens = 0;
 let outputTokens = 0;
 
-for (const fixture of parsed.data) {
+for (const fixture of selected) {
   console.log(`\n${fixture.id}`);
   for (let run = 1; run <= RUNS_PER_FIXTURE; run++) {
     runs++;
@@ -39,14 +70,17 @@ for (const fixture of parsed.data) {
       const { judgment, usage } = await judgeQuote({ message: fixture.message }, fixture.quote);
       inputTokens += usage.inputTokens;
       outputTokens += usage.outputTokens;
+      const mismatchReasons: string[] = [];
       const cells = GATES.map((gate) => {
         const got = judgment.gates[gate].pass ? "pass" : "fail";
         const expected = fixture.expected[gate];
         verdicts++;
         if (got === expected) matches++;
+        else mismatchReasons.push(`${gate} reason: ${judgment.gates[gate].reason}`);
         return `${gate}: expected ${expected}, got ${got}${got === expected ? "" : "  <-- MISMATCH"}`;
       });
       console.log(`  run ${run}: ${cells.join(" | ")}`);
+      for (const reason of mismatchReasons) console.log(`      ${reason}`);
     } catch (err) {
       // A malformed judge reply is its own outcome, not a gate mismatch; anything else (e.g. a bad key) stops the run.
       if (err instanceof JudgeNoToolUseError || err instanceof JudgeValidationError) {

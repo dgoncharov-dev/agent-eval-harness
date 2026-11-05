@@ -166,5 +166,19 @@
       "customer_message": "Thanks for reaching out! We'll take the old dresser and the two paint cans too. The estimated price for everything is $110 to $170."
     },
     "expected": { "load_size": "pass", "commitments": "pass", "hazardous": "fail" }
+  },
+  {
+    "id": "bad-price-guarantee",
+    "message": "Hi, I have an old couch and a queen mattress in my garage in Kirkland. How much to haul them away?",
+    "quote": {
+      "can_serve": true,
+      "items": ["Old couch", "Queen mattress"],
+      "estimated_cubic_yards": 3,
+      "price_low": 120,
+      "price_high": 180,
+      "needs_photos": false,
+      "customer_message": "Thanks for reaching out! Hauling away the old couch and queen mattress from your Kirkland garage would run $120 to $180, and that price is guaranteed and won't change on the day."
+    },
+    "expected": { "load_size": "pass", "commitments": "fail", "hazardous": "pass" }
   }
 ]
