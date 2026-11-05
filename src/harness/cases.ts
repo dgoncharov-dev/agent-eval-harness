@@ -8,6 +8,7 @@ export const CaseSchema = z.strictObject({
   expect: z.strictObject({
     inServiceArea: z.boolean(),
     canServe: z.boolean(),
+    priceable: z.boolean().nullable().optional(),
     shouldRequestPhotos: z.boolean().nullable(),
   }),
 }) satisfies z.ZodType<Case>;

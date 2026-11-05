@@ -3,7 +3,9 @@ import { canServeMatchesExpectation } from "./canServeMatchesExpectation.js";
 import { itemsPresentWhenServing } from "./itemsPresentWhenServing.js";
 import { noAvailabilityPromise } from "./noAvailabilityPromise.js";
 import { noDiscountLanguage } from "./noDiscountLanguage.js";
+import { noPriceInUnpricedMessage } from "./noPriceInUnpricedMessage.js";
 import { photosWhenExpected } from "./photosWhenExpected.js";
+import { priceableMatchesExpectation } from "./priceableMatchesExpectation.js";
 import { priceOrder } from "./priceOrder.js";
 import { priceWithinLimits } from "./priceWithinLimits.js";
 import { serviceAreaHandling } from "./serviceAreaHandling.js";
@@ -18,6 +20,8 @@ export const ALL_CHECKS: Check[] = [
   photosWhenExpected,
   canServeMatchesExpectation,
   itemsPresentWhenServing,
+  priceableMatchesExpectation,
+  noPriceInUnpricedMessage,
 ];
 
 export function runAllChecks(quote: Quote, testCase: Case): CheckResult[] {

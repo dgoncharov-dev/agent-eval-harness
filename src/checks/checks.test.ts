@@ -5,7 +5,9 @@ import { canServeMatchesExpectation } from "./canServeMatchesExpectation.js";
 import { itemsPresentWhenServing } from "./itemsPresentWhenServing.js";
 import { noAvailabilityPromise } from "./noAvailabilityPromise.js";
 import { noDiscountLanguage } from "./noDiscountLanguage.js";
+import { noPriceInUnpricedMessage } from "./noPriceInUnpricedMessage.js";
 import { photosWhenExpected } from "./photosWhenExpected.js";
+import { priceableMatchesExpectation } from "./priceableMatchesExpectation.js";
 import { priceOrder } from "./priceOrder.js";
 import { priceWithinLimits } from "./priceWithinLimits.js";
 import { serviceAreaHandling } from "./serviceAreaHandling.js";
@@ -63,6 +65,14 @@ describe("priceWithinLimits", () => {
   });
   it("fails zero prices when can_serve is true", () => {
     expect(priceWithinLimits(quoteWith({ price_low: 0, price_high: 0 }), baseCase).passed).toBe(false);
+  });
+  it("passes zero prices when can_serve is true and photos are requested", () => {
+    const unsizable = quoteWith({ price_low: 0, price_high: 0, needs_photos: true });
+    expect(priceWithinLimits(unsizable, baseCase).passed).toBe(true);
+  });
+  it("fails a zero price_low with a real price_high even when photos are requested", () => {
+    const partial = quoteWith({ price_low: 0, price_high: 500, needs_photos: true });
+    expect(priceWithinLimits(partial, baseCase).passed).toBe(false);
   });
   it("fails below the minimum charge", () => {
     expect(priceWithinLimits(quoteWith({ price_low: 50 }), baseCase).passed).toBe(false);
@@ -285,6 +295,78 @@ describe("itemsPresentWhenServing", () => {
   });
   it("fails when serving with no items", () => {
     expect(itemsPresentWhenServing(quoteWith({ items: [] }), baseCase).passed).toBe(false);
+  });
+});
+
+describe("priceableMatchesExpectation", () => {
+  const unpriced = quoteWith({ price_low: 0, price_high: 0, needs_photos: true });
+
+  it("passes with no expectation (absent or null)", () => {
+    expect(priceableMatchesExpectation(unpriced, baseCase).passed).toBe(true);
+    expect(priceableMatchesExpectation(unpriced, caseWith({ priceable: null })).passed).toBe(true);
+  });
+  it("priceable true: passes a non-zero price within limits", () => {
+    expect(priceableMatchesExpectation(baseQuote, caseWith({ priceable: true })).passed).toBe(true);
+  });
+  it("priceable true: fails zero prices", () => {
+    expect(priceableMatchesExpectation(unpriced, caseWith({ priceable: true })).passed).toBe(false);
+  });
+  it("priceable true: fails a price above the max quote", () => {
+    const tooHigh = quoteWith({ price_high: 1500 });
+    expect(priceableMatchesExpectation(tooHigh, caseWith({ priceable: true })).passed).toBe(false);
+  });
+  it("priceable false: passes zero prices with photos requested", () => {
+    expect(priceableMatchesExpectation(unpriced, caseWith({ priceable: false })).passed).toBe(true);
+  });
+  it("priceable false: fails when a price is given", () => {
+    expect(priceableMatchesExpectation(baseQuote, caseWith({ priceable: false })).passed).toBe(false);
+  });
+  it("priceable false: fails zero prices without a photo request", () => {
+    const noPhotos = quoteWith({ price_low: 0, price_high: 0, needs_photos: false });
+    expect(priceableMatchesExpectation(noPhotos, caseWith({ priceable: false })).passed).toBe(false);
+  });
+});
+
+describe("noPriceInUnpricedMessage", () => {
+  const unpriced = (customer_message: string): Quote =>
+    quoteWith({ price_low: 0, price_high: 0, needs_photos: true, customer_message });
+
+  it("passes an unpriced message that only names the $99 minimum", () => {
+    const quote = unpriced("Please send photos. Our $99 minimum applies, and we'll quote after we see the load.");
+    expect(noPriceInUnpricedMessage(quote, baseCase).passed).toBe(true);
+  });
+  it("passes '99 dollars' as the minimum", () => {
+    expect(noPriceInUnpricedMessage(unpriced("The minimum is 99 dollars."), baseCase).passed).toBe(true);
+  });
+  it("passes an unpriced message with no amounts", () => {
+    expect(noPriceInUnpricedMessage(unpriced("Could you send a few photos?"), baseCase).passed).toBe(true);
+  });
+  it("passes a decline (can_serve false) that names the minimum", () => {
+    const decline = quoteWith({
+      can_serve: false,
+      price_low: 0,
+      price_high: 0,
+      customer_message: "Sorry, that is outside our service area. Our minimum is $99.",
+    });
+    expect(noPriceInUnpricedMessage(decline, baseCase).passed).toBe(true);
+  });
+  it("passes a priced quote naming its price range", () => {
+    const priced = saying("We can haul that for roughly $400 to $700.");
+    expect(noPriceInUnpricedMessage(priced, baseCase).passed).toBe(true);
+  });
+  it("fails '$400 to $700' in an unpriced message", () => {
+    const quote = unpriced("Send photos please. Typically that runs $400 to $700.");
+    expect(noPriceInUnpricedMessage(quote, baseCase).passed).toBe(false);
+  });
+  it("fails a comma-grouped amount like $1,200", () => {
+    expect(noPriceInUnpricedMessage(unpriced("It could reach $1,200."), baseCase).passed).toBe(false);
+  });
+  it("fails 'N dollars' other than the minimum", () => {
+    expect(noPriceInUnpricedMessage(unpriced("Probably around 500 dollars."), baseCase).passed).toBe(false);
+  });
+  it("fails when the minimum appears alongside another amount", () => {
+    const quote = unpriced("Our $99 minimum applies, but expect about $600 for a full garage.");
+    expect(noPriceInUnpricedMessage(quote, baseCase).passed).toBe(false);
   });
 });
 

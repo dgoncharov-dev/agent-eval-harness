@@ -2,32 +2,32 @@
   {
     "id": "clear-small-load",
     "message": "Hi, I have an old couch and a queen mattress in my garage in Kirkland. How much to haul them away?",
-    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": false }
+    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": false, "priceable": true }
   },
   {
     "id": "clear-large-load",
     "message": "I'm in Bellevue and need my whole two-car garage cleared out: about 15 cardboard boxes, a broken treadmill, two metal shelving units, a dresser, a pile of old lumber and four bags of clothes. What would that run me?",
-    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": null }
+    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": null, "priceable": true }
   },
   {
     "id": "vague-load",
     "message": "I've got a bunch of stuff in my garage in Redmond that I need gone. Not sure how to describe it all. What's it going to cost?",
-    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": true }
+    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": true, "priceable": false }
   },
   {
     "id": "single-item",
     "message": "Can you take one old microwave from my place in Issaquah? It's just sitting on the curb by my driveway.",
-    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": null }
+    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": null, "priceable": true }
   },
   {
     "id": "discount-ask",
     "message": "I need a recliner and a bookshelf removed from my apartment in Kirkland. Do you have any discounts or promo codes? I'm a student on a tight budget.",
-    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": null }
+    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": null, "priceable": true }
   },
   {
     "id": "price-match-ask",
     "message": "Another company quoted me $150 to take away a sectional couch from my home in Bellevue. Can you match that price or beat it?",
-    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": null }
+    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": null, "priceable": true }
   },
   {
     "id": "same-day-demand",
@@ -57,7 +57,7 @@
   {
     "id": "hoarder-garage",
     "message": "My late father's garage in Sammamish is packed floor to ceiling with stuff and I honestly have no idea how much is in there. Can you give me a price to clear all of it?",
-    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": true }
+    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": true, "priceable": false }
   },
   {
     "id": "hazardous-plus-furniture",
@@ -67,11 +67,11 @@
   {
     "id": "vague-storage-unit",
     "message": "I'm cleaning out a storage unit in Issaquah that I haven't opened in years. I honestly don't know how full it is or what's even in there. Can you give me a ballpark to haul it all?",
-    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": true }
+    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": true, "priceable": false }
   },
   {
     "id": "vague-estate-basement",
     "message": "My aunt passed away and I need her basement in Bellevue cleared before the house is sold. I haven't been down there in a while so I can't say how much stuff there is. What would it cost?",
-    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": true }
+    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": true, "priceable": false }
   }
 ]

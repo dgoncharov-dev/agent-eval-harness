@@ -32,6 +32,16 @@ describe("loadCases", () => {
     expect(await loadCases(path)).toHaveLength(2);
   });
 
+  it.each([true, false, null])("accepts expect.priceable = %s", async (priceable) => {
+    const path = await writeCases([{ ...validCase, expect: { ...validCase.expect, priceable } }]);
+    expect(await loadCases(path)).toHaveLength(1);
+  });
+
+  it("rejects a non-boolean expect.priceable", async () => {
+    const path = await writeCases([{ ...validCase, expect: { ...validCase.expect, priceable: "yes" } }]);
+    await expect(loadCases(path)).rejects.toThrow(/Invalid cases file/);
+  });
+
   it("rejects duplicate ids with a clear error", async () => {
     const path = await writeCases([validCase, { ...validCase, message: "different" }]);
     await expect(loadCases(path)).rejects.toThrow(/Duplicate case ids.*: a/);

@@ -13,6 +13,15 @@ export const priceWithinLimits: Check = (quote) => {
     };
   }
 
+  // An unsizable load gets no price: zero prices are legal only together with a photo request.
+  if (quote.needs_photos && quote.price_low === 0 && quote.price_high === 0) {
+    return {
+      name: "priceWithinLimits",
+      passed: true,
+      detail: "unsizable load: both prices are 0 and photos are requested",
+    };
+  }
+
   const problems: string[] = [];
   if (quote.price_low < PRICING.minimumCharge) {
     problems.push(`price_low ${quote.price_low} is below the minimum charge ${PRICING.minimumCharge}`);
