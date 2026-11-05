@@ -19,7 +19,7 @@ const usage: QuoteUsage = { inputTokens: 60, outputTokens: 40 };
 const makeCase = (id: string): Case => ({
   id,
   message: `message for ${id}`,
-  expect: { inServiceArea: true, shouldRequestPhotos: null },
+  expect: { inServiceArea: true, canServe: true, shouldRequestPhotos: null },
 });
 
 const okFn: QuoteFn = async () => ({ quote, usage });

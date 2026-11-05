@@ -6,7 +6,7 @@ export type Case = {
   id: string;
   message: string;
   // null means no expectation for that field
-  expect: { inServiceArea: boolean; shouldRequestPhotos: boolean | null };
+  expect: { inServiceArea: boolean; canServe: boolean; shouldRequestPhotos: boolean | null };
 };
 
 export type Check = (quote: Quote, testCase: Case) => CheckResult;

@@ -23,7 +23,7 @@ const baseQuote: Quote = {
 const baseCase: Case = {
   id: "base",
   message: "I have an old couch in Bellevue.",
-  expect: { inServiceArea: true, shouldRequestPhotos: null },
+  expect: { inServiceArea: true, canServe: true, shouldRequestPhotos: null },
 };
 
 const quoteWith = (overrides: Partial<Quote>): Quote => ({ ...baseQuote, ...overrides });
@@ -170,10 +170,19 @@ describe("noAvailabilityPromise", () => {
     expect(noAvailabilityPromise(quote, baseCase).passed).toBe(false);
   });
 
-  // Known limitation: the exemption applies to the whole sentence, so a disclaimer
-  // ("confirmed separately") shields a real promise made in the same sentence.
-  it.fails("catches a promise sharing a sentence with the disclaimer", () => {
+  it("fails a promise after 'but' even when the first half is a disclaimer", () => {
     const quote = saying("Scheduling is confirmed separately, but we'll be there tomorrow at 3pm.");
+    expect(noAvailabilityPromise(quote, baseCase).passed).toBe(false);
+  });
+  it("fails a promise after 'but' following a refusal", () => {
+    const quote = saying("I can't promise a window, but we'll be there tomorrow.");
+    expect(noAvailabilityPromise(quote, baseCase).passed).toBe(false);
+  });
+
+  // Known limitation: the exemption applies to the whole sentence, so a disclaimer
+  // ("confirmed separately") shields a real promise joined to it by anything other than "but"/"however".
+  it.fails("catches a promise joined to the disclaimer with 'and'", () => {
+    const quote = saying("Scheduling is confirmed separately and we'll be there tomorrow at 3pm.");
     expect(noAvailabilityPromise(quote, baseCase).passed).toBe(false);
   });
 
@@ -239,14 +248,21 @@ describe("canServeMatchesExpectation", () => {
   it("passes when can_serve matches inServiceArea true", () => {
     expect(canServeMatchesExpectation(baseQuote, baseCase).passed).toBe(true);
   });
-  it("passes when can_serve false matches inServiceArea false", () => {
+  it("passes when can_serve false matches canServe false", () => {
     const decline = quoteWith({ can_serve: false, price_low: 0, price_high: 0 });
-    expect(canServeMatchesExpectation(decline, caseWith({ inServiceArea: false })).passed).toBe(true);
+    expect(canServeMatchesExpectation(decline, caseWith({ inServiceArea: false, canServe: false })).passed).toBe(true);
   });
-  it("fails when the assistant quotes an out-of-area customer", () => {
-    expect(canServeMatchesExpectation(baseQuote, caseWith({ inServiceArea: false })).passed).toBe(false);
+  it("passes a decline for an in-area customer whose request is all hazardous", () => {
+    const decline = quoteWith({ can_serve: false, price_low: 0, price_high: 0 });
+    expect(canServeMatchesExpectation(decline, caseWith({ inServiceArea: true, canServe: false })).passed).toBe(true);
   });
-  it("fails when the assistant declines an in-area customer", () => {
+  it("ignores inServiceArea and compares against canServe", () => {
+    expect(canServeMatchesExpectation(baseQuote, caseWith({ inServiceArea: false, canServe: true })).passed).toBe(true);
+  });
+  it("fails when the assistant quotes a customer who cannot be served", () => {
+    expect(canServeMatchesExpectation(baseQuote, caseWith({ inServiceArea: false, canServe: false })).passed).toBe(false);
+  });
+  it("fails when the assistant declines a customer who can be served", () => {
     const decline = quoteWith({ can_serve: false, price_low: 0, price_high: 0 });
     expect(canServeMatchesExpectation(decline, baseCase).passed).toBe(false);
   });

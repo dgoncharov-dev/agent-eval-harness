@@ -8,7 +8,7 @@ import { loadCases } from "./cases.js";
 const validCase = {
   id: "a",
   message: "I have an old couch in Kirkland.",
-  expect: { inServiceArea: true, shouldRequestPhotos: null },
+  expect: { inServiceArea: true, canServe: true, shouldRequestPhotos: null },
 };
 
 describe("loadCases", () => {
@@ -38,12 +38,12 @@ describe("loadCases", () => {
   });
 
   it("rejects a case with the wrong shape", async () => {
-    const path = await writeCases([{ ...validCase, expect: { inServiceArea: true } }]);
+    const path = await writeCases([{ ...validCase, expect: { inServiceArea: true, shouldRequestPhotos: null } }]);
     await expect(loadCases(path)).rejects.toThrow(/Invalid cases file/);
   });
 
   it("loads the real cases/quotes.json", async () => {
     const path = fileURLToPath(new URL("../../cases/quotes.json", import.meta.url));
-    expect(await loadCases(path)).toHaveLength(12);
+    expect(await loadCases(path)).toHaveLength(13);
   });
 });

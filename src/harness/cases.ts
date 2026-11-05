@@ -7,6 +7,7 @@ export const CaseSchema = z.strictObject({
   message: z.string().min(1),
   expect: z.strictObject({
     inServiceArea: z.boolean(),
+    canServe: z.boolean(),
     shouldRequestPhotos: z.boolean().nullable(),
   }),
 }) satisfies z.ZodType<Case>;

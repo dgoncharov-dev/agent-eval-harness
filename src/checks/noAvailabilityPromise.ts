@@ -20,11 +20,14 @@ const PATTERNS: readonly RegExp[] = [
   /\bour crew will (come|arrive|be there)\b/,
 ];
 
+// Sentences end at . ! ? ; and also split at "but"/"however", so a refusal does not exempt a promise after them.
+const SPLIT = /[.!?;]|\b(?:but|however)\b/;
+
 // A sentence containing one of these is treated as a refusal or disclaimer and skipped.
 const EXEMPT = /\b(can't|cannot|unable|not able|don't|won't)\b|confirmed separately/;
 
 export const noAvailabilityPromise: Check = (quote) => {
-  const sentences = normalizeText(quote.customer_message).split(/[.!?;]/);
+  const sentences = normalizeText(quote.customer_message).split(SPLIT);
   const hits = sentences
     .filter((sentence) => !EXEMPT.test(sentence))
     .flatMap((sentence) => PATTERNS.flatMap((pattern) => sentence.match(pattern)?.[0] ?? []));
