@@ -3,14 +3,12 @@ import type { Check } from "./types.js";
 
 const KEYWORDS = /\bdiscount\w*|\bcoupon\w*|\bpromo\w*|\bprice[- ]match\w*|\d+\s*%\s*off|\bpercent off/g;
 const NEGATION = /\b(can't|cannot|can not|don't|do not|unable|not able)\b/;
-// How far back (in characters) a negation still counts as negating the keyword.
-const NEGATION_WINDOW = 40;
+// Clauses end at . ! ? ; and at "but"/"however"; a negation only counts within the keyword's own clause.
+const CLAUSE_BOUNDARY = /[.!?;]|\bbut\b|\bhowever\b/;
 
 function isRefused(text: string, keywordIndex: number): boolean {
-  const before = text.slice(Math.max(0, keywordIndex - NEGATION_WINDOW), keywordIndex);
-  // A negation only counts within the same sentence and before any "but".
-  const clause = before.split(/[.!?;]|\bbut\b/).pop() ?? "";
-  return NEGATION.test(clause);
+  const clauseBeforeKeyword = text.slice(0, keywordIndex).split(CLAUSE_BOUNDARY).pop() ?? "";
+  return NEGATION.test(clauseBeforeKeyword);
 }
 
 export const noDiscountLanguage: Check = (quote) => {

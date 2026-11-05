@@ -2,50 +2,58 @@ import { readFile } from "node:fs/promises";
 import { z } from "zod";
 
 const RunFileSchema = z.object({
-  results: z.array(
+  timestamp: z.string(),
+  model: z.string(),
+  repeats: z.number(),
+  cases: z.array(
     z.object({
       id: z.string(),
-      status: z.enum(["completed", "format_error"]),
-      checks: z.array(z.object({ name: z.string(), passed: z.boolean() })),
-      quote: z.object({ customer_message: z.string() }).optional(),
+      attempts: z.array(z.unknown()),
+      outcomes: z.record(z.string(), z.number()),
     }),
   ),
+  summary: z.object({ attempts: z.number(), outcomes: z.record(z.string(), z.number()) }),
 });
-type RunResult = z.infer<typeof RunFileSchema>["results"][number];
+type RunFile = z.infer<typeof RunFileSchema>;
 
-async function loadRun(path: string): Promise<Map<string, RunResult>> {
+async function loadRun(path: string): Promise<RunFile> {
   const parsed = RunFileSchema.safeParse(JSON.parse(await readFile(path, "utf8")));
   if (!parsed.success) throw new Error(`Invalid results file ${path}:\n${z.prettifyError(parsed.error)}`);
-  return new Map(parsed.data.results.map((r) => [r.id, r]));
+  return parsed.data;
 }
 
-function describeResult(result: RunResult | undefined): string {
-  if (!result) return "(missing)";
-  const failed = result.checks.filter((c) => !c.passed).map((c) => c.name);
-  return failed.length > 0 ? `${result.status}: ${failed.join(", ")}` : `${result.status}: ok`;
+function rate(passed: number | undefined, attempts: number | undefined): string {
+  return attempts === undefined ? "(missing)" : `${passed ?? 0}/${attempts}`;
+}
+
+function caseRate(run: RunFile, id: string): string {
+  const found = run.cases.find((c) => c.id === id);
+  return found ? rate(found.outcomes.passed, found.attempts.length) : "(missing)";
 }
 
 const [pathA, pathB] = process.argv.slice(2);
 if (!pathA || !pathB) {
-  console.error("Usage: npm run compare -- <results-a.json> <results-b.json>");
+  console.error("Usage: npm run compare -- <run-a.json> <run-b.json>");
   process.exit(1);
 }
 
 const [runA, runB] = await Promise.all([loadRun(pathA), loadRun(pathB)]);
-const ids = [...new Set([...runA.keys(), ...runB.keys()])];
-
-const rows = ids.map((id) => ({ id, a: describeResult(runA.get(id)), b: describeResult(runB.get(id)) }));
-const idWidth = Math.max("case".length, ...rows.map((r) => r.id.length));
-const aWidth = Math.max("run A".length, ...rows.map((r) => r.a.length));
-
-console.log(`${"case".padEnd(idWidth)}  ${"run A".padEnd(aWidth)}  run B`);
-for (const row of rows) console.log(`${row.id.padEnd(idWidth)}  ${row.a.padEnd(aWidth)}  ${row.b}`);
-
-const inBoth = ids.filter((id) => runA.has(id) && runB.has(id));
-const identical = inBoth.filter((id) => {
-  const a = runA.get(id)?.quote?.customer_message;
-  const b = runB.get(id)?.quote?.customer_message;
-  return a !== undefined && a === b;
-});
+for (const [label, run] of [["A", runA], ["B", runB]] as const) {
+  console.log(`Run ${label}: ${run.timestamp}  model=${run.model}  repeats=${run.repeats}`);
+}
 console.log("");
-console.log(`Identical customer_message: ${identical.length} of ${inBoth.length} cases present in both runs`);
+
+const ids = [...new Set([...runA.cases.map((c) => c.id), ...runB.cases.map((c) => c.id)])];
+const idWidth = Math.max("case".length, "OVERALL".length, ...ids.map((id) => id.length));
+const colWidth = 9;
+const row = (label: string, a: string, b: string) => `${label.padEnd(idWidth)}  ${a.padEnd(colWidth)}  ${b}`;
+
+console.log(row("case", "run A", "run B"));
+for (const id of ids) console.log(row(id, caseRate(runA, id), caseRate(runB, id)));
+console.log(
+  row(
+    "OVERALL",
+    rate(runA.summary.outcomes.passed, runA.summary.attempts),
+    rate(runB.summary.outcomes.passed, runB.summary.attempts),
+  ),
+);

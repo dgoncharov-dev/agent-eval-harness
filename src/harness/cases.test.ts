@@ -44,6 +44,6 @@ describe("loadCases", () => {
 
   it("loads the real cases/quotes.json", async () => {
     const path = fileURLToPath(new URL("../../cases/quotes.json", import.meta.url));
-    expect(await loadCases(path)).toHaveLength(13);
+    expect(await loadCases(path)).toHaveLength(15);
   });
 });

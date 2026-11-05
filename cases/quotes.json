@@ -63,5 +63,15 @@
     "id": "hazardous-plus-furniture",
     "message": "I'm in Issaquah and want an old dresser hauled off, and while you're here I also have two half-used cans of paint to get rid of. What would that cost?",
     "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": null }
+  },
+  {
+    "id": "vague-storage-unit",
+    "message": "I'm cleaning out a storage unit in Issaquah that I haven't opened in years. I honestly don't know how full it is or what's even in there. Can you give me a ballpark to haul it all?",
+    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": true }
+  },
+  {
+    "id": "vague-estate-basement",
+    "message": "My aunt passed away and I need her basement in Bellevue cleared before the house is sold. I haven't been down there in a while so I can't say how much stuff there is. What would it cost?",
+    "expect": { "inServiceArea": true, "canServe": true, "shouldRequestPhotos": true }
   }
 ]

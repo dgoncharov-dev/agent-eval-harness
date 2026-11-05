@@ -97,12 +97,18 @@ describe("noDiscountLanguage", () => {
     expect(noDiscountLanguage(quote, baseCase).passed).toBe(false);
   });
 
+  it("passes a refusal whose clause is followed by 'but' and an unrelated clause", () => {
+    const quote = saying(
+      "We're not able to match other companies' prices or offer discounts, but we're happy to give you a clear quote.",
+    );
+    expect(noDiscountLanguage(quote, baseCase).passed).toBe(true);
+  });
   it("fails when 'No problem!' precedes a coupon offer (bare 'no' is not a refusal)", () => {
     const quote = saying("No problem! Happy to give you a 10% off coupon.");
     expect(noDiscountLanguage(quote, baseCase).passed).toBe(false);
   });
 
-  // Known limitation: the negation window spans commas, so a negation about something else
+  // Known limitation: clauses are not split at commas, so a negation about something else
   // ("don't charge extra fees") wrongly suppresses a real coupon offer later in the same sentence.
   it.fails("catches a coupon offer after an unrelated negation across a comma", () => {
     const quote = saying("We don't charge extra fees, and here's a coupon for you.");
