@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Quote } from "../sut/schema.js";
 import { ALL_CHECKS, runAllChecks } from "./index.js";
 import { canServeMatchesExpectation } from "./canServeMatchesExpectation.js";
+import { itemsPresentWhenServing } from "./itemsPresentWhenServing.js";
 import { noAvailabilityPromise } from "./noAvailabilityPromise.js";
 import { noDiscountLanguage } from "./noDiscountLanguage.js";
 import { photosWhenExpected } from "./photosWhenExpected.js";
@@ -265,6 +266,19 @@ describe("canServeMatchesExpectation", () => {
   it("fails when the assistant declines a customer who can be served", () => {
     const decline = quoteWith({ can_serve: false, price_low: 0, price_high: 0 });
     expect(canServeMatchesExpectation(decline, baseCase).passed).toBe(false);
+  });
+});
+
+describe("itemsPresentWhenServing", () => {
+  it("passes when serving with items listed", () => {
+    expect(itemsPresentWhenServing(baseQuote, baseCase).passed).toBe(true);
+  });
+  it("passes a decline with an empty items list", () => {
+    const decline = quoteWith({ can_serve: false, items: [], price_low: 0, price_high: 0 });
+    expect(itemsPresentWhenServing(decline, baseCase).passed).toBe(true);
+  });
+  it("fails when serving with no items", () => {
+    expect(itemsPresentWhenServing(quoteWith({ items: [] }), baseCase).passed).toBe(false);
   });
 });
 

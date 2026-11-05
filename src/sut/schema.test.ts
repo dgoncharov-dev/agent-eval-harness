@@ -31,6 +31,15 @@ describe("QuoteSchema", () => {
     expect(QuoteSchema.safeParse(decline).success).toBe(true);
   });
 
+  it("parses a decline with an empty items list", () => {
+    const decline = { ...validQuote, can_serve: false, items: [], price_low: 0, price_high: 0 };
+    expect(QuoteSchema.safeParse(decline).success).toBe(true);
+  });
+
+  it("rejects a quote with items that are not strings", () => {
+    expect(QuoteSchema.safeParse({ ...validQuote, items: [1, 2] }).success).toBe(false);
+  });
+
   it("rejects a negative price", () => {
     expect(QuoteSchema.safeParse({ ...validQuote, price_high: -5 }).success).toBe(false);
   });

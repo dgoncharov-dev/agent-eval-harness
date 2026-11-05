@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "vitest run"
+    "test": "vitest run",
+    "compare": "tsx scripts/compare-runs.ts"
   },
   "keywords": [],
   "author": "",

@@ -4,7 +4,7 @@ export const QuoteSchema = z.object({
   can_serve: z
     .boolean()
     .describe("False when the request is outside the service area or contains nothing the business can take; then set prices to 0"),
-  items: z.array(z.string()).min(1).describe("Items to be removed, one entry per item or group"),
+  items: z.array(z.string()).describe("Items to be removed; may be empty only when can_serve is false"),
   estimated_cubic_yards: z.number().min(0).describe("Estimated total volume of the load in cubic yards"),
   price_low: z.number().min(0).describe("Low end of the quoted price range in USD"),
   price_high: z.number().min(0).describe("High end of the quoted price range in USD"),

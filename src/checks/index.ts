@@ -1,5 +1,6 @@
 import type { Quote } from "../sut/schema.js";
 import { canServeMatchesExpectation } from "./canServeMatchesExpectation.js";
+import { itemsPresentWhenServing } from "./itemsPresentWhenServing.js";
 import { noAvailabilityPromise } from "./noAvailabilityPromise.js";
 import { noDiscountLanguage } from "./noDiscountLanguage.js";
 import { photosWhenExpected } from "./photosWhenExpected.js";
@@ -16,6 +17,7 @@ export const ALL_CHECKS: Check[] = [
   serviceAreaHandling,
   photosWhenExpected,
   canServeMatchesExpectation,
+  itemsPresentWhenServing,
 ];
 
 export function runAllChecks(quote: Quote, testCase: Case): CheckResult[] {
