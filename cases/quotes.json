@@ -1,0 +1,62 @@
+[
+  {
+    "id": "clear-small-load",
+    "message": "Hi, I have an old couch and a queen mattress in my garage in Kirkland. How much to haul them away?",
+    "expect": { "inServiceArea": true, "shouldRequestPhotos": false }
+  },
+  {
+    "id": "clear-large-load",
+    "message": "I'm in Bellevue and need my whole two-car garage cleared out: about 15 cardboard boxes, a broken treadmill, two metal shelving units, a dresser, a pile of old lumber and four bags of clothes. What would that run me?",
+    "expect": { "inServiceArea": true, "shouldRequestPhotos": null }
+  },
+  {
+    "id": "vague-load",
+    "message": "I've got a bunch of stuff in my garage in Redmond that I need gone. Not sure how to describe it all. What's it going to cost?",
+    "expect": { "inServiceArea": true, "shouldRequestPhotos": true }
+  },
+  {
+    "id": "single-item",
+    "message": "Can you take one old microwave from my place in Issaquah? It's just sitting on the curb by my driveway.",
+    "expect": { "inServiceArea": true, "shouldRequestPhotos": null }
+  },
+  {
+    "id": "discount-ask",
+    "message": "I need a recliner and a bookshelf removed from my apartment in Kirkland. Do you have any discounts or promo codes? I'm a student on a tight budget.",
+    "expect": { "inServiceArea": true, "shouldRequestPhotos": null }
+  },
+  {
+    "id": "price-match-ask",
+    "message": "Another company quoted me $150 to take away a sectional couch from my home in Bellevue. Can you match that price or beat it?",
+    "expect": { "inServiceArea": true, "shouldRequestPhotos": null }
+  },
+  {
+    "id": "same-day-demand",
+    "message": "I have an old dryer and a box spring in Sammamish and I need them picked up today at 3pm. Can you confirm you'll be there then?",
+    "expect": { "inServiceArea": true, "shouldRequestPhotos": null }
+  },
+  {
+    "id": "guaranteed-window-ask",
+    "message": "I need a few bags of yard debris and an old patio table taken from my house in Redmond. I need a guaranteed arrival window of 9-11am this Saturday, can you promise that?",
+    "expect": { "inServiceArea": true, "shouldRequestPhotos": null }
+  },
+  {
+    "id": "outside-area-tacoma",
+    "message": "I'm in Tacoma and need an old sofa and a coffee table hauled away. How much would that be?",
+    "expect": { "inServiceArea": false, "shouldRequestPhotos": null }
+  },
+  {
+    "id": "outside-area-everett",
+    "message": "Looking for someone to remove a hot tub cover and some scrap fencing from my yard in Everett. What's your price?",
+    "expect": { "inServiceArea": false, "shouldRequestPhotos": null }
+  },
+  {
+    "id": "hazardous-items",
+    "message": "I'm clearing out my shed in Redmond and have about six old paint cans and a half-full propane tank. Can you take those away?",
+    "expect": { "inServiceArea": true, "shouldRequestPhotos": null }
+  },
+  {
+    "id": "hoarder-garage",
+    "message": "My late father's garage in Sammamish is packed floor to ceiling with stuff and I honestly have no idea how much is in there. Can you give me a price to clear all of it?",
+    "expect": { "inServiceArea": true, "shouldRequestPhotos": true }
+  }
+]
