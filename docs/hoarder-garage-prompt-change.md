@@ -77,7 +77,7 @@ The case flipped from passing to failing between v1 and v2. The cause of that fl
 ## What the replies looked like
 
 - **Version A:** four of the five failing replies asked for photos and promised a price afterwards without giving a number, for example "We'll give you a firm price after reviewing them." The one passing reply quoted 12 cubic yards.
-- **Version B:** the structured quote is known (above). The reply text has not been reviewed yet.
+- **Version B:** the replies are polite, give a number, state the assumption behind it and ask for photos. Two attempts were reviewed (the 1st and 4th of 5), and both read like this: "Since we can't see the contents, this is a provisional estimate of about $400 to $700, based on a typical full one-car garage (about 10 cubic yards)." The two replies are near-duplicates, and neither mentions hazardous materials (the earlier boilerplate is gone). The model follows the rule's wording closely, including the 10-cubic-yard figure, which is what the rule told it to say. That does not show whether it would size the load differently without the number. One concern: a garage described as packed floor to ceiling is quoted as a typical one-car garage, which may be low if the real load is bigger. Judging that is the LLM judge's job.
 
 ## Reading the result honestly
 
