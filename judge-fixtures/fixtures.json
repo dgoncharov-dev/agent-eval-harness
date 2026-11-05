@@ -1,0 +1,170 @@
+[
+  {
+    "id": "good-unsizable",
+    "message": "My late father's garage in Sammamish is packed floor to ceiling with stuff and I honestly have no idea how much is in there. Can you give me a price to clear all of it?",
+    "quote": {
+      "can_serve": true,
+      "items": ["Contents of a packed garage"],
+      "estimated_cubic_yards": 0,
+      "price_low": 0,
+      "price_high": 0,
+      "needs_photos": true,
+      "customer_message": "I'm sorry about your father. A packed garage is hard to size from a description, so could you send a few photos, including a wide shot of the whole space? Once we've seen them we'll give you a firm price. Our minimum charge is $99."
+    },
+    "expected": { "load_size": "pass", "commitments": "pass", "hazardous": "pass" }
+  },
+  {
+    "id": "bad-old-hoarder",
+    "message": "My late father's garage in Sammamish is packed floor to ceiling with stuff and I honestly have no idea how much is in there. Can you give me a price to clear all of it?",
+    "quote": {
+      "can_serve": true,
+      "items": ["Contents of a packed garage"],
+      "estimated_cubic_yards": 10,
+      "price_low": 400,
+      "price_high": 700,
+      "needs_photos": true,
+      "customer_message": "Thanks for reaching out! Here is a provisional estimate of about $400 to $700 based on a typical full one-car garage. Please send a few photos and we'll confirm the final price."
+    },
+    "expected": { "load_size": "fail", "commitments": "pass", "hazardous": "pass" }
+  },
+  {
+    "id": "bad-same-day-1",
+    "message": "I have an old dryer and a box spring in Sammamish and I need them picked up today at 3pm. Can you confirm you'll be there then?",
+    "quote": {
+      "can_serve": true,
+      "items": ["Old dryer", "Box spring"],
+      "estimated_cubic_yards": 3,
+      "price_low": 120,
+      "price_high": 180,
+      "needs_photos": false,
+      "customer_message": "Thanks for reaching out! We can pick up the old dryer and box spring in Sammamish. The estimated price is $120 to $180. I can't confirm a specific arrival time here, since scheduling is confirmed separately. Our team will reach out to lock in today's pickup."
+    },
+    "expected": { "load_size": "pass", "commitments": "fail", "hazardous": "pass" }
+  },
+  {
+    "id": "bad-same-day-2",
+    "message": "I have an old dryer and a box spring in Sammamish and I need them picked up today at 3pm. Can you confirm you'll be there then?",
+    "quote": {
+      "can_serve": true,
+      "items": ["Old dryer", "Box spring"],
+      "estimated_cubic_yards": 3,
+      "price_low": 120,
+      "price_high": 180,
+      "needs_photos": false,
+      "customer_message": "Thanks for reaching out! We can haul away your old dryer and box spring in Sammamish. The estimated price is $120 to $180. I can't confirm a specific arrival time here, since scheduling is confirmed separately. Our team will follow up to set up today's pickup."
+    },
+    "expected": { "load_size": "pass", "commitments": "fail", "hazardous": "pass" }
+  },
+  {
+    "id": "bad-vague-hazard-1",
+    "message": "I've got a bunch of stuff in my garage in Redmond that I need gone. Not sure how to describe it all. What's it going to cost?",
+    "quote": {
+      "can_serve": true,
+      "items": ["Assorted garage contents (unspecified items)"],
+      "estimated_cubic_yards": 0,
+      "price_low": 0,
+      "price_high": 0,
+      "needs_photos": true,
+      "customer_message": "Thanks for reaching out! We serve Redmond, so we can help. To give you an accurate quote, please send a few photos of the garage contents, ideally one wide shot of the whole pile and a couple of closer ones. Our minimum charge is $99. Once we see the photos, we'll send your firm price. Please don't include any paint, chemicals, propane tanks, batteries, or asbestos, as we can't take those."
+    },
+    "expected": { "load_size": "pass", "commitments": "pass", "hazardous": "fail" }
+  },
+  {
+    "id": "bad-vague-hazard-2",
+    "message": "I've got a bunch of stuff in my garage in Redmond that I need gone. Not sure how to describe it all. What's it going to cost?",
+    "quote": {
+      "can_serve": true,
+      "items": ["Miscellaneous garage contents (exact items not yet described)"],
+      "estimated_cubic_yards": 0,
+      "price_low": 0,
+      "price_high": 0,
+      "needs_photos": true,
+      "customer_message": "Thanks for reaching out! We serve Redmond, so we can help. Since we can't size the load from the description yet, please send a few clear photos of the garage contents (a wide shot of the whole pile plus a couple of close-ups) so we can give you an accurate quote. Our minimum charge is $99. Once we have the photos, we'll send your firm price. Please don't include any paint, chemicals, propane tanks, batteries, or asbestos, as we can't take those."
+    },
+    "expected": { "load_size": "pass", "commitments": "pass", "hazardous": "fail" }
+  },
+  {
+    "id": "bad-underpriced-large",
+    "message": "I'm in Bellevue and need my whole two-car garage cleared out: about 15 cardboard boxes, a broken treadmill, two metal shelving units, a dresser, a pile of old lumber and four bags of clothes. What would that run me?",
+    "quote": {
+      "can_serve": true,
+      "items": ["15 cardboard boxes", "Broken treadmill", "Two metal shelving units", "Dresser", "Pile of old lumber", "Four bags of clothes"],
+      "estimated_cubic_yards": 2,
+      "price_low": 99,
+      "price_high": 120,
+      "needs_photos": false,
+      "customer_message": "Thanks for reaching out! We can clear all of that out of your Bellevue garage for about $99 to $120."
+    },
+    "expected": { "load_size": "fail", "commitments": "pass", "hazardous": "pass" }
+  },
+  {
+    "id": "bad-subtle-discount",
+    "message": "I need a recliner and a bookshelf removed from my apartment in Kirkland. Do you have any discounts or promo codes? I'm a student on a tight budget.",
+    "quote": {
+      "can_serve": true,
+      "items": ["Recliner", "Bookshelf"],
+      "estimated_cubic_yards": 3,
+      "price_low": 120,
+      "price_high": 210,
+      "needs_photos": false,
+      "customer_message": "Thanks for reaching out! Removing the recliner and bookshelf would run about $120 to $210. Since you're a student on a budget, we can knock a little off for students. Just let us know if you'd like to go ahead."
+    },
+    "expected": { "load_size": "pass", "commitments": "fail", "hazardous": "pass" }
+  },
+  {
+    "id": "good-same-day",
+    "message": "I have an old dryer and a box spring in Sammamish and I need them picked up today at 3pm. Can you confirm you'll be there then?",
+    "quote": {
+      "can_serve": true,
+      "items": ["Old dryer", "Box spring"],
+      "estimated_cubic_yards": 3,
+      "price_low": 120,
+      "price_high": 180,
+      "needs_photos": false,
+      "customer_message": "Thanks for reaching out! We can pick up the old dryer and box spring in Sammamish. The estimated price is $120 to $180. I can't promise a specific day or time; our team will confirm scheduling separately."
+    },
+    "expected": { "load_size": "pass", "commitments": "pass", "hazardous": "pass" }
+  },
+  {
+    "id": "good-clear-small",
+    "message": "Hi, I have an old couch and a queen mattress in my garage in Kirkland. How much to haul them away?",
+    "quote": {
+      "can_serve": true,
+      "items": ["Old couch", "Queen mattress"],
+      "estimated_cubic_yards": 3,
+      "price_low": 120,
+      "price_high": 180,
+      "needs_photos": false,
+      "customer_message": "Thanks for reaching out! Hauling away the old couch and queen mattress from your Kirkland garage would run about $120 to $180. Let us know if you'd like to go ahead."
+    },
+    "expected": { "load_size": "pass", "commitments": "pass", "hazardous": "pass" }
+  },
+  {
+    "id": "good-hazardous",
+    "message": "I'm clearing out my shed in Redmond and have about six old paint cans and a half-full propane tank. Can you take those away?",
+    "quote": {
+      "can_serve": false,
+      "items": [],
+      "estimated_cubic_yards": 0,
+      "price_low": 0,
+      "price_high": 0,
+      "needs_photos": false,
+      "customer_message": "Thanks for reaching out! I'm sorry, but we can't take paint or propane tanks, and since those are everything in your request, there's nothing left for us to haul."
+    },
+    "expected": { "load_size": "pass", "commitments": "pass", "hazardous": "pass" }
+  },
+  {
+    "id": "bad-hazard-priced",
+    "message": "I'm in Issaquah and want an old dresser hauled off, and while you're here I also have two half-used cans of paint to get rid of. What would that cost?",
+    "quote": {
+      "can_serve": true,
+      "items": ["Old dresser", "Two half-used cans of paint"],
+      "estimated_cubic_yards": 2,
+      "price_low": 110,
+      "price_high": 170,
+      "needs_photos": false,
+      "customer_message": "Thanks for reaching out! We'll take the old dresser and the two paint cans too. The estimated price for everything is $110 to $170."
+    },
+    "expected": { "load_size": "pass", "commitments": "pass", "hazardous": "fail" }
+  }
+]
