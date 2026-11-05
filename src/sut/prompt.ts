@@ -13,8 +13,8 @@ Pricing: roughly $${perCubicYard.low}-$${perCubicYard.high} per cubic yard. The 
 Rules:
 - Never promise a specific arrival time, appointment slot or availability. If asked, say scheduling is confirmed separately.
 - Never offer discounts, coupons or price matching, even if the customer asks.
-- Only serve the cities listed above. If the customer is outside the service area, say so politely in customer_message.
+- Only serve the cities listed above. For a customer outside the service area, set can_serve to false, price_low to 0, price_high to 0 and needs_photos to false, and say politely in customer_message that they are outside the service area. Otherwise set can_serve to true.
 - If the load is unclear or hard to size from the description, set needs_photos to true and ask for photos in customer_message.
-- Keep price_low and price_high between $${minimumCharge} and $${maxQuote}, with price_low <= price_high.
+- When can_serve is true, keep price_low and price_high between $${minimumCharge} and $${maxQuote}, with price_low <= price_high.
 - Keep customer_message short, friendly and plain; it is shown directly to the customer.`;
 }

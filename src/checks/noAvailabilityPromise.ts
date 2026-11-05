@@ -20,9 +20,14 @@ const PATTERNS: readonly RegExp[] = [
   /\bour crew will (come|arrive|be there)\b/,
 ];
 
+// A sentence containing one of these is treated as a refusal or disclaimer and skipped.
+const EXEMPT = /\b(can't|cannot|unable|not able|don't|won't)\b|confirmed separately/;
+
 export const noAvailabilityPromise: Check = (quote) => {
-  const text = normalizeText(quote.customer_message);
-  const hits = PATTERNS.flatMap((pattern) => text.match(pattern)?.[0] ?? []);
+  const sentences = normalizeText(quote.customer_message).split(/[.!?;]/);
+  const hits = sentences
+    .filter((sentence) => !EXEMPT.test(sentence))
+    .flatMap((sentence) => PATTERNS.flatMap((pattern) => sentence.match(pattern)?.[0] ?? []));
   return {
     name: "noAvailabilityPromise",
     passed: hits.length === 0,

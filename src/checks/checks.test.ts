@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Quote } from "../sut/schema.js";
 import { ALL_CHECKS, runAllChecks } from "./index.js";
+import { canServeMatchesExpectation } from "./canServeMatchesExpectation.js";
 import { noAvailabilityPromise } from "./noAvailabilityPromise.js";
 import { noDiscountLanguage } from "./noDiscountLanguage.js";
 import { photosWhenExpected } from "./photosWhenExpected.js";
@@ -10,6 +11,7 @@ import { serviceAreaHandling } from "./serviceAreaHandling.js";
 import type { Case } from "./types.js";
 
 const baseQuote: Quote = {
+  can_serve: true,
   items: ["old couch"],
   estimated_cubic_yards: 3,
   price_low: 120,
@@ -49,6 +51,17 @@ describe("priceWithinLimits", () => {
   });
   it("passes exactly at the limits", () => {
     expect(priceWithinLimits(quoteWith({ price_low: 99, price_high: 1200 }), baseCase).passed).toBe(true);
+  });
+  it("passes a decline with zero prices when can_serve is false", () => {
+    const decline = quoteWith({ can_serve: false, price_low: 0, price_high: 0 });
+    expect(priceWithinLimits(decline, baseCase).passed).toBe(true);
+  });
+  it("fails a decline with non-zero prices when can_serve is false", () => {
+    const decline = quoteWith({ can_serve: false, price_low: 120, price_high: 210 });
+    expect(priceWithinLimits(decline, baseCase).passed).toBe(false);
+  });
+  it("fails zero prices when can_serve is true", () => {
+    expect(priceWithinLimits(quoteWith({ price_low: 0, price_high: 0 }), baseCase).passed).toBe(false);
   });
   it("fails below the minimum charge", () => {
     expect(priceWithinLimits(quoteWith({ price_low: 50 }), baseCase).passed).toBe(false);
@@ -137,10 +150,31 @@ describe("noAvailabilityPromise", () => {
     expect(noAvailabilityPromise(saying(message), baseCase).passed).toBe(false);
   });
 
-  // Known limitation: no negation handling, so a refusal to promise a time is still flagged by "today".
-  it.fails("does not flag 'We can't promise a time today.'", () => {
-    const quote = saying("We can't promise a time today.");
+  it("passes a refusal to promise a time", () => {
+    expect(noAvailabilityPromise(saying("We can't promise a time today."), baseCase).passed).toBe(true);
+  });
+  it("passes a refusal that also mentions the disclaimer", () => {
+    const quote = saying("I can't confirm a 3pm arrival, since scheduling is confirmed separately.");
     expect(noAvailabilityPromise(quote, baseCase).passed).toBe(true);
+  });
+  it("passes a disclaimer that mentions a day", () => {
+    const quote = saying("Scheduling for this Saturday will be confirmed separately.");
+    expect(noAvailabilityPromise(quote, baseCase).passed).toBe(true);
+  });
+  it("fails a promise to lock in a time for today", () => {
+    const quote = saying("Our team will reach out to lock in a time for today.");
+    expect(noAvailabilityPromise(quote, baseCase).passed).toBe(false);
+  });
+  it("fails a promise in a later sentence even when an earlier one is a refusal", () => {
+    const quote = saying("I can't confirm a time. We'll be there tomorrow.");
+    expect(noAvailabilityPromise(quote, baseCase).passed).toBe(false);
+  });
+
+  // Known limitation: the exemption applies to the whole sentence, so a disclaimer
+  // ("confirmed separately") shields a real promise made in the same sentence.
+  it.fails("catches a promise sharing a sentence with the disclaimer", () => {
+    const quote = saying("Scheduling is confirmed separately, but we'll be there tomorrow at 3pm.");
+    expect(noAvailabilityPromise(quote, baseCase).passed).toBe(false);
   });
 
   // Known limitation: only matches explicit days, clock times and listed phrases, so vague timing is missed.
@@ -198,6 +232,23 @@ describe("photosWhenExpected", () => {
   });
   it("fails when photos were not expected but requested", () => {
     expect(photosWhenExpected(quoteWith({ needs_photos: true }), caseWith({ shouldRequestPhotos: false })).passed).toBe(false);
+  });
+});
+
+describe("canServeMatchesExpectation", () => {
+  it("passes when can_serve matches inServiceArea true", () => {
+    expect(canServeMatchesExpectation(baseQuote, baseCase).passed).toBe(true);
+  });
+  it("passes when can_serve false matches inServiceArea false", () => {
+    const decline = quoteWith({ can_serve: false, price_low: 0, price_high: 0 });
+    expect(canServeMatchesExpectation(decline, caseWith({ inServiceArea: false })).passed).toBe(true);
+  });
+  it("fails when the assistant quotes an out-of-area customer", () => {
+    expect(canServeMatchesExpectation(baseQuote, caseWith({ inServiceArea: false })).passed).toBe(false);
+  });
+  it("fails when the assistant declines an in-area customer", () => {
+    const decline = quoteWith({ can_serve: false, price_low: 0, price_high: 0 });
+    expect(canServeMatchesExpectation(decline, baseCase).passed).toBe(false);
   });
 });
 

@@ -6,6 +6,7 @@ import { QuoteSchema, type Quote } from "../sut/schema.js";
 import { runAll, runCase, summarize, type QuoteFn } from "./run.js";
 
 const quote: Quote = {
+  can_serve: true,
   items: ["old couch"],
   estimated_cubic_yards: 3,
   price_low: 120,
