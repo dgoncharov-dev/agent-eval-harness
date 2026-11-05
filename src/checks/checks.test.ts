@@ -107,6 +107,39 @@ describe("noDiscountLanguage", () => {
     expect(noDiscountLanguage(quote, baseCase).passed).toBe(false);
   });
 
+  it("passes a refusal phrased with \"aren't able\" followed by 'but' and an unrelated clause", () => {
+    const quote = saying(
+      "Unfortunately, we aren't able to match other companies' prices or offer discounts, but we'd be happy to provide our service.",
+    );
+    expect(noDiscountLanguage(quote, baseCase).passed).toBe(true);
+  });
+  it("passes \"We are not able to offer discounts.\"", () => {
+    expect(noDiscountLanguage(saying("We are not able to offer discounts."), baseCase).passed).toBe(true);
+  });
+  it.each([
+    "We aren't able to offer discounts.",
+    "We are not able to offer discounts.",
+    "Our team isn't able to offer discounts.",
+    "Our team is not able to offer discounts.",
+    "We won't offer discounts.",
+    "We will not offer discounts.",
+    "We wouldn't offer discounts.",
+    "We would not offer discounts.",
+    "We couldn't offer discounts.",
+    "We could not offer discounts.",
+  ])("treats a refusal as a refusal: %s", (message) => {
+    expect(noDiscountLanguage(saying(message), baseCase).passed).toBe(true);
+  });
+  it.each(["We can offer a discount.", "Happy to give you a discount.", "We will offer a discount."])(
+    "still fails a plain offer: %s",
+    (message) => {
+      expect(noDiscountLanguage(saying(message), baseCase).passed).toBe(false);
+    },
+  );
+  it("still fails when an extended refusal is followed by an offer after 'but'", () => {
+    const quote = saying("We aren't able to offer discounts, but we do price matching.");
+    expect(noDiscountLanguage(quote, baseCase).passed).toBe(false);
+  });
   it("passes a refusal whose clause is followed by 'but' and an unrelated clause", () => {
     const quote = saying(
       "We're not able to match other companies' prices or offer discounts, but we're happy to give you a clear quote.",

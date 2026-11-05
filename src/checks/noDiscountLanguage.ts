@@ -2,7 +2,8 @@ import { normalizeText } from "./text.js";
 import type { Check } from "./types.js";
 
 const KEYWORDS = /\bdiscount\w*|\bcoupon\w*|\bpromo\w*|\bprice[- ]match\w*|\d+\s*%\s*off|\bpercent off/g;
-const NEGATION = /\b(can't|cannot|can not|don't|do not|unable|not able)\b/;
+const NEGATION =
+  /\b(can't|cannot|can not|don't|do not|unable|not able|aren't able|are not able|isn't able|is not able|won't|will not|wouldn't|would not|couldn't|could not)\b/;
 // Clauses end at . ! ? ; and at "but"/"however"; a negation only counts within the keyword's own clause.
 const CLAUSE_BOUNDARY = /[.!?;]|\bbut\b|\bhowever\b/;
 
