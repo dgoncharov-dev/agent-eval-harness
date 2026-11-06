@@ -1,0 +1,6 @@
+{
+  "defaultMinPassRate": 0.6,
+  "perCase": { "same-day-demand": 0.3 },
+  "maxFormatErrors": 2,
+  "judgeMinAllGatesRate": 0.6
+}

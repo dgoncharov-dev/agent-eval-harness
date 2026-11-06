@@ -1,0 +1,65 @@
+name: Eval
+
+on:
+  workflow_dispatch:
+    inputs:
+      repeats:
+        description: "Repeats per case (1-10)"
+        required: false
+        default: "3"
+        type: string
+      judge:
+        description: "Also run the LLM judge"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: npm
+      - run: npm ci
+
+      - name: Validate inputs
+        env:
+          REPEATS: ${{ inputs.repeats }}
+        run: |
+          if ! [[ "$REPEATS" =~ ^([1-9]|10)$ ]]; then
+            echo "repeats must be an integer from 1 to 10"
+            exit 1
+          fi
+
+      # run-eval exits 1 on any failing check and known failures exist, so this step may not fail the job.
+      # The baseline check below decides pass/fail.
+      - name: Run eval
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          REPEATS: ${{ inputs.repeats }}
+          JUDGE: ${{ inputs.judge }}
+        run: |
+          args=(--repeats "$REPEATS")
+          if [ "$JUDGE" = "true" ]; then
+            args+=(--judge)
+          fi
+          npx tsx scripts/run-eval.ts "${args[@]}"
+
+      - name: Check baseline
+        run: npx tsx scripts/check-baseline.ts reports/latest.json
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: eval-reports
+          path: reports/
+          if-no-files-found: ignore

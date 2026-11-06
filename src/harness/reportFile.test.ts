@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseRunFile } from "./reportFile.js";
+import { parseBaselineRunFile, parseRunFile } from "./reportFile.js";
 
 const outcomes = { passed: 1, failed_checks: 0, format_error: 0, refusal: 0, api_error: 0 };
 
@@ -50,5 +50,25 @@ describe("parseRunFile", () => {
   it("rejects a malformed report with the file label in the message", () => {
     const { cases: _omitted, ...withoutCases } = oldReport;
     expect(() => parseRunFile(withoutCases, "bad.json")).toThrow(/Invalid results file bad\.json/);
+  });
+});
+
+describe("parseBaselineRunFile", () => {
+  it("loads a report without an aborted flag or judgments", () => {
+    const { aborted: _aborted, ...withoutAborted } = oldReport;
+    const run = parseBaselineRunFile(withoutAborted, "old.json");
+    expect(run.aborted).toBeUndefined();
+    expect(run.cases[0]?.attempts[0]?.outcome).toBe("passed");
+  });
+
+  it("reads the abort flag", () => {
+    expect(parseBaselineRunFile({ ...oldReport, aborted: true }, "a.json").aborted).toBe(true);
+  });
+
+  it("rejects an attempt with an unknown outcome or a malformed judgment", () => {
+    const attempt = oldReport.cases[0]?.attempts[0];
+    const withAttempt = (a: unknown) => ({ ...oldReport, cases: [{ ...oldReport.cases[0], attempts: [a] }] });
+    expect(() => parseBaselineRunFile(withAttempt({ ...attempt, outcome: "weird" }), "bad.json")).toThrow(/Invalid results file bad\.json/);
+    expect(() => parseBaselineRunFile(withAttempt({ ...attempt, judgment: { gates: {} } }), "bad.json")).toThrow(/Invalid results file/);
   });
 });
