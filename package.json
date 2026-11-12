@@ -7,7 +7,8 @@
     "test": "vitest run",
     "compare": "tsx scripts/compare-runs.ts",
     "report": "tsx scripts/make-report.ts",
-    "probe": "tsx scripts/probe-case.ts"
+    "probe": "tsx scripts/probe-case.ts",
+    "screenshot": "tsx scripts/screenshot-report.ts"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
+    "playwright": "^1.65.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.0.5"
