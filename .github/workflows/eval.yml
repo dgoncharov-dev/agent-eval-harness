@@ -56,6 +56,11 @@ jobs:
       - name: Check baseline
         run: npx tsx scripts/check-baseline.ts reports/latest.json
 
+      - name: Generate HTML report
+        if: always()
+        continue-on-error: true
+        run: npx tsx scripts/make-report.ts reports/latest.json reports/report.html baseline/baseline.json
+
       - name: Upload reports
         if: always()
         uses: actions/upload-artifact@v7

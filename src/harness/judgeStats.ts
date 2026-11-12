@@ -1,6 +1,16 @@
 import { judgmentPassed, type Judgment } from "../judge/schema.js";
 import type { QuoteUsage } from "../sut/quote.js";
-import type { CaseResult, RunReport } from "./run.js";
+
+// The slice of a run report these stats read; the in-memory RunReport and a parsed report file both fit.
+export type StatsAttempt = {
+  outcome: string;
+  checks: readonly { name: string; passed: boolean }[];
+  judgment?: Judgment | undefined;
+  judgeUsage?: QuoteUsage | undefined;
+  judgeError?: unknown;
+  notJudged?: boolean | undefined;
+};
+export type StatsReport = { cases: readonly { id: string; attempts: readonly StatsAttempt[] }[] };
 
 export const GATE_NAMES = ["load_size", "commitments", "hazardous"] as const;
 export type GateName = (typeof GATE_NAMES)[number];
@@ -35,9 +45,9 @@ export type Disagreement = {
   failedGates: { gate: GateName; reason: string }[];
 };
 
-type JudgedAttempt = { caseId: string; attempt: number; result: CaseResult; judgment: Judgment };
+type JudgedAttempt = { caseId: string; attempt: number; result: StatsAttempt; judgment: Judgment };
 
-function judgedAttempts(report: RunReport): JudgedAttempt[] {
+function judgedAttempts(report: StatsReport): JudgedAttempt[] {
   return report.cases.flatMap(({ id, attempts }) =>
     attempts.flatMap((result, index) =>
       result.judgment ? [{ caseId: id, attempt: index + 1, result, judgment: result.judgment }] : [],
@@ -46,7 +56,7 @@ function judgedAttempts(report: RunReport): JudgedAttempt[] {
 }
 
 // Per-gate pass counts over the judged attempts in the given list.
-export function gateCounts(attempts: readonly CaseResult[]): Record<GateName, GateCount> {
+export function gateCounts(attempts: readonly StatsAttempt[]): Record<GateName, GateCount> {
   const counts: Record<GateName, GateCount> = {
     load_size: { pass: 0, total: 0 },
     commitments: { pass: 0, total: 0 },
@@ -62,7 +72,7 @@ export function gateCounts(attempts: readonly CaseResult[]): Record<GateName, Ga
   return counts;
 }
 
-export function summarizeJudge(report: RunReport): JudgeSummary {
+export function summarizeJudge(report: StatsReport): JudgeSummary {
   const all = report.cases.flatMap((c) => c.attempts);
   const judged = judgedAttempts(report);
   const counts = gateCounts(all);
@@ -100,7 +110,7 @@ export function summarizeJudge(report: RunReport): JudgeSummary {
 }
 
 // Deterministic verdict (rows) x judge all-gates verdict (columns), over judged attempts only.
-export function judgeCrossTable(report: RunReport): CrossTable {
+export function judgeCrossTable(report: StatsReport): CrossTable {
   const table: CrossTable = {
     checksPass: { judgePass: 0, judgeFail: 0 },
     checksFail: { judgePass: 0, judgeFail: 0 },
@@ -113,7 +123,7 @@ export function judgeCrossTable(report: RunReport): CrossTable {
   return table;
 }
 
-export function findDisagreements(report: RunReport): Disagreement[] {
+export function findDisagreements(report: StatsReport): Disagreement[] {
   return judgedAttempts(report).flatMap(({ caseId, attempt, result, judgment }) => {
     const checksPassed = result.outcome === "passed";
     if (checksPassed === judgmentPassed(judgment)) return [];

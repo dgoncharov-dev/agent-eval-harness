@@ -1,21 +1,7 @@
-import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { checkBaseline, parseBaseline } from "../src/harness/baseline.js";
+import { readJsonFile } from "../src/harness/readJsonFile.js";
 import { parseBaselineRunFile } from "../src/harness/reportFile.js";
-
-async function readJson(path: string, what: string): Promise<unknown> {
-  let text: string;
-  try {
-    text = await readFile(path, "utf8");
-  } catch {
-    throw new Error(`Cannot read ${what} file: ${path}`);
-  }
-  try {
-    return JSON.parse(text);
-  } catch {
-    throw new Error(`${what} file is not valid JSON: ${path}`);
-  }
-}
 
 const [reportPath, baselinePathArg] = process.argv.slice(2);
 if (!reportPath) {
@@ -25,8 +11,8 @@ if (!reportPath) {
 const baselinePath = baselinePathArg ?? fileURLToPath(new URL("../baseline/baseline.json", import.meta.url));
 
 try {
-  const report = parseBaselineRunFile(await readJson(reportPath, "report"), reportPath);
-  const baseline = parseBaseline(await readJson(baselinePath, "baseline"), baselinePath);
+  const report = parseBaselineRunFile(await readJsonFile(reportPath, "report"), reportPath);
+  const baseline = parseBaseline(await readJsonFile(baselinePath, "baseline"), baselinePath);
   const { rows, violations } = checkBaseline(report, baseline);
 
   const pct = (rate: number) => `${(rate * 100).toFixed(0)}%`;

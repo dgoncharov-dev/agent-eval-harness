@@ -114,7 +114,7 @@ describe("summarizeJudge", () => {
   });
 
   it("returns null quality means and zero rates when nothing was judged", () => {
-    const empty = summarizeJudge({ cases: [{ ...caseB, attempts: [attempt("case-b", "format_error")] }], aborted: false, skipped: [] });
+    const empty = summarizeJudge({ cases: [{ ...caseB, attempts: [attempt("case-b", "format_error")] }] });
     expect(empty.judged).toBe(0);
     expect(empty.quality).toEqual({ uncertainty_handling: null, answers_and_next_step: null, tone_brevity: null });
     expect(empty.gates.load_size).toEqual({ pass: 0, total: 0, rate: 0 });
@@ -151,6 +151,6 @@ describe("findDisagreements", () => {
   });
 
   it("is empty when every judged attempt agrees", () => {
-    expect(findDisagreements({ cases: [{ ...caseA, attempts: caseA.attempts.slice(0, 2) }], aborted: false, skipped: [] })).toEqual([]);
+    expect(findDisagreements({ cases: [{ ...caseA, attempts: caseA.attempts.slice(0, 2) }] })).toEqual([]);
   });
 });

@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "vitest run",
-    "compare": "tsx scripts/compare-runs.ts"
+    "compare": "tsx scripts/compare-runs.ts",
+    "report": "tsx scripts/make-report.ts"
   },
   "keywords": [],
   "author": "",
