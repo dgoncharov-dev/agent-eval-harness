@@ -82,11 +82,11 @@ With 5 repeats, 4/5 and 5/5 are not meaningfully different. Only big gaps, such 
 
 ## Next
 
-1. CI with a known-failures baseline.
-2. HTML report.
-3. README with architecture diagram and results.
-4. Calibrate the judge against ~10 hand-labelled real replies.
-5. Polish list: next-step rule in the SUT prompt, strict SUT tool, same-day wording fix.
+1. Playwright screenshot of the report for the README.
+2. README with architecture diagram and results.
+3. Calibrate the judge against about 10 hand-labelled real replies.
+4. LinkedIn write-up.
+5. Polish list: store raw tool input on format-error attempts, mitigate the "099" flake (strict tool or one retry), next-step rule in the SUT prompt, same-day wording fix.
 
 ## Update 2026-11-05: spec change, LLM judge, first judged run
 
@@ -100,3 +100,10 @@ With 5 repeats, 4/5 and 5/5 are not meaningfully different. Only big gaps, such 
 - **Format error 1 of 75:** Haiku returned `price_low` as a string. The SUT tool is not strict. Parked for the polish week.
 - **Quality (mean 1-3):** `uncertainty_handling` 2.97, `answers_and_next_step` 2.49, `tone_brevity` 2.59. The most common low score is a price with no next step (all 5 `clear-small-load` replies). Not tuned yet. The judge's quality taste is not calibrated against human labels.
 - **Cost:** a judged run is about 180k input and 32k output Sonnet tokens plus about 130k input and 22k output Haiku tokens, roughly $1 by estimate; check the Console for the real figure.
+
+## Update 2026-11-11: CI, HTML report, and a structured-output flake
+
+- **CI:** a free workflow (ci.yml) typechecks and runs the unit tests on every push and pull request. A separate manual-only workflow (eval.yml, workflow_dispatch) runs the eval with an optional judge, then compares the result to a committed baseline (baseline/baseline.json: minimum pass rate per case, with a lower floor for the known weak same-day-demand case, a format-error cap, and judge minimums). Pass/fail is decided by the baseline check, not by "any failure", because a sampled model has known failures. The workflow uploads the run JSON and an HTML report as an artifact. The eval workflow is manual because a judged run costs real money.
+- **HTML report:** one self-contained file (no JavaScript, no external requests, all model text HTML-escaped) with a per-case table, judge gates, a checks-vs-judge cross-table, quality means and a collapsed block per failing attempt showing the customer message, the check details, the judge's reasons and the reply.
+- **Reproducible run (CI run 43140798928, 15 cases x 5, Haiku 5.5 SUT, Sonnet 5.5 judge):** 74/75 deterministic, judge all-gates 74/74, 0 checks-vs-judge disagreements (the price-match-ask check bug fixed on 2026-11-05 no longer appears), quality means 2.99 (uncertainty_handling), 2.51 (answers_and_next_step), 2.72 (tone_brevity). same-day-demand was 5/5 in this run after 3/5, 1/3 and 4/5 in earlier runs, so it is sampling noise and not a fix; the "improved" label in the report only means above the default minimum in that run.
+- **Format-error flake:** Haiku 5.5 occasionally returns price_low as the string "099" (leading zero) instead of the number 99, which fails QuoteSchema validation. 4 failures in 83 attempts (about 5%) on guaranteed-window-ask under the current prompt: 2 in 13 eval attempts across two runs, 0 in a first 20-attempt probe, 2 in a second 50-attempt probe (scripts/probe-case.ts). Both probe failures had "099" in price_low and otherwise valid output. Every successful attempt on this case also has price_low 99, because a 2-cubic-yard load at $40-$70 per yard falls below the $99 minimum and is floored to it. Hypothesis, untested: the model pads 99 to match the three digits of the high price. Not tested whether other minimum-charge cases show it. A first 20-run probe with zero failures was too small to rule it out: at a 4% rate about 44% of 20-run samples are clean. The report did not store the raw tool input for format errors, so this needed a probe to find. Not mitigated yet: options are strict tool use on the SUT tool or one retry on a validation error.
