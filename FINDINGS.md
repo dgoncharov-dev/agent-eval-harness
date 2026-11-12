@@ -86,7 +86,7 @@ With 5 repeats, 4/5 and 5/5 are not meaningfully different. Only big gaps, such 
 2. README with architecture diagram and results.
 3. Calibrate the judge against about 10 hand-labelled real replies.
 4. LinkedIn write-up.
-5. Polish list: store raw tool input on format-error attempts, mitigate the "099" flake (strict tool or one retry), next-step rule in the SUT prompt, same-day wording fix.
+5. Polish list: store raw tool input on format-error attempts, mitigate the "099" flake (strict tool or one retry), next-step rule in the SUT prompt, same-day wording fix, judge fails open: gate should fail when --judge was requested but judged attempts < attempts minus an allowed error cap.
 
 ## Update 2026-11-05: spec change, LLM judge, first judged run
 
