@@ -6,7 +6,8 @@
   "scripts": {
     "test": "vitest run",
     "compare": "tsx scripts/compare-runs.ts",
-    "report": "tsx scripts/make-report.ts"
+    "report": "tsx scripts/make-report.ts",
+    "probe": "tsx scripts/probe-case.ts"
   },
   "keywords": [],
   "author": "",

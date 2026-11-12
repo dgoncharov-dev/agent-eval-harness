@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseEvalFlags } from "./flags.js";
+import { parseEvalFlags, parseProbeArgs } from "./flags.js";
 
 describe("parseEvalFlags", () => {
   it("defaults to 3 repeats, repeats * 40000 tokens, and no judge", () => {
@@ -68,5 +68,36 @@ describe("parseEvalFlags: judge flags", () => {
 
   it("does not let the judge flags change the SUT defaults", () => {
     expect(parseEvalFlags(["--judge"])).toMatchObject({ repeats: 3, maxTokens: 120_000 });
+  });
+});
+
+describe("parseProbeArgs", () => {
+  it("defaults to 20 attempts", () => {
+    expect(parseProbeArgs(["same-day-demand"])).toEqual({ caseId: "same-day-demand", n: 20 });
+  });
+
+  it("accepts --n in both forms, before or after the case id", () => {
+    expect(parseProbeArgs(["a", "--n", "5"])).toEqual({ caseId: "a", n: 5 });
+    expect(parseProbeArgs(["--n=7", "a"])).toEqual({ caseId: "a", n: 7 });
+  });
+
+  it("accepts the maximum of 50 and rejects 51", () => {
+    expect(parseProbeArgs(["a", "--n", "50"]).n).toBe(50);
+    expect(() => parseProbeArgs(["a", "--n", "51"])).toThrow(/--n must be at most 50/);
+  });
+
+  it.each(["0", "-3", "2.5", "abc", "1e1", ""])("rejects --n %j", (value) => {
+    expect(() => parseProbeArgs(["a", "--n", value])).toThrow(/--n must be a positive integer/);
+  });
+
+  it("rejects --n with no value", () => {
+    expect(() => parseProbeArgs(["a", "--n"])).toThrow(/--n needs a value/);
+  });
+
+  it("rejects a missing case id, extra positionals and unknown flags", () => {
+    expect(() => parseProbeArgs([])).toThrow(/Missing case id/);
+    expect(() => parseProbeArgs(["--n", "3"])).toThrow(/Missing case id/);
+    expect(() => parseProbeArgs(["a", "b"])).toThrow(/Unexpected extra argument "b"/);
+    expect(() => parseProbeArgs(["a", "--count", "3"])).toThrow(/Unknown argument "--count"/);
   });
 });

@@ -53,3 +53,33 @@ export function parseEvalFlags(argv: readonly string[]): EvalFlags {
     maxJudgeTokens,
   };
 }
+
+export type ProbeArgs = { caseId: string; n: number };
+
+const DEFAULT_PROBE_N = 20;
+const MAX_PROBE_N = 50;
+
+// probe-case.ts <case-id> [--n N]; N is a positive integer up to 50. Accepts "--n 5" and "--n=5".
+export function parseProbeArgs(argv: readonly string[]): ProbeArgs {
+  let caseId: string | undefined;
+  let n = DEFAULT_PROBE_N;
+
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i] ?? "";
+    const [flag = "", inlineValue] = arg.split("=", 2);
+    if (flag === "--n") {
+      const value = inlineValue ?? argv[++i];
+      n = parsePositiveInt(flag, value);
+      if (n > MAX_PROBE_N) throw new Error(`--n must be at most ${MAX_PROBE_N}, got "${value}"`);
+    } else if (arg.startsWith("-")) {
+      throw new Error(`Unknown argument "${arg}". Usage: probe-case.ts <case-id> [--n N]`);
+    } else if (caseId === undefined) {
+      caseId = arg;
+    } else {
+      throw new Error(`Unexpected extra argument "${arg}". Usage: probe-case.ts <case-id> [--n N]`);
+    }
+  }
+
+  if (caseId === undefined) throw new Error("Missing case id. Usage: probe-case.ts <case-id> [--n N]");
+  return { caseId, n };
+}

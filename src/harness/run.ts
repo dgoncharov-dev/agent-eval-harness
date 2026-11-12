@@ -80,7 +80,7 @@ function emptyOutcomes(): Record<Outcome, number> {
 }
 
 // A bad or unauthorized key should stop the whole run, not be recorded as one more api_error.
-function isAuthError(err: unknown): boolean {
+export function isAuthError(err: unknown): boolean {
   if (err instanceof Anthropic.AuthenticationError) return true;
   return typeof err === "object" && err !== null && "status" in err && (err.status === 401 || err.status === 403);
 }
