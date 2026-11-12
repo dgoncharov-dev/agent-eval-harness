@@ -143,7 +143,7 @@ function judgeSections(report: ReportRun): string {
   return cross + disagreementList + quality;
 }
 
-function failureBlock(caseId: string, attemptNumber: number, attempt: Attempt): string | undefined {
+function failureBlock(caseId: string, message: string | undefined, attemptNumber: number, attempt: Attempt): string | undefined {
   const failedChecks = attempt.checks.filter((c) => !c.passed);
   const failedGates = attempt.judgment ? GATE_NAMES.filter((g) => !attempt.judgment?.gates[g].pass) : [];
   if (attempt.outcome === "passed" && failedGates.length === 0) return undefined;
@@ -158,6 +158,7 @@ function failureBlock(caseId: string, attemptNumber: number, attempt: Attempt): 
     parts.push(`<p>Judge failed gates</p><ul>${failedGates.map((g) => `<li>${e(g)}: ${e(judgment.gates[g].reason)}</li>`).join("")}</ul>`);
   }
   if (attempt.judgeError) parts.push(`<p>Judge error (${e(attempt.judgeError.kind)})</p><pre>${e(attempt.judgeError.message)}</pre>`);
+  if (message !== undefined) parts.push(`<p>Customer message</p><pre>${e(message)}</pre>`);
   parts.push(`<p>Reply</p><pre>${attempt.quote ? e(attempt.quote.customer_message) : "(no reply)"}</pre>`);
 
   const reasons = [attempt.outcome !== "passed" ? attempt.outcome : undefined, failedGates.length > 0 ? "judge gate" : undefined]
@@ -168,7 +169,7 @@ function failureBlock(caseId: string, attemptNumber: number, attempt: Attempt): 
 
 function failures(report: ReportRun): string {
   const blocks = report.cases.flatMap((c) =>
-    c.attempts.flatMap((attempt, index) => failureBlock(c.id, index + 1, attempt) ?? []),
+    c.attempts.flatMap((attempt, index) => failureBlock(c.id, c.message, index + 1, attempt) ?? []),
   );
   return `<h2>Failures (${blocks.length})</h2>${blocks.length === 0 ? '<p class="muted">No failing attempts.</p>' : blocks.join("")}`;
 }

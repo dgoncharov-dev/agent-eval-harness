@@ -190,6 +190,44 @@ describe("renderReportHtml", () => {
   });
 });
 
+describe("customer message in failure blocks", () => {
+  const failing: Attempt = {
+    outcome: "failed_checks",
+    quote: quote("Our reply"),
+    checks: [{ name: "priceOrder", passed: false, detail: "low above high" }],
+    usage,
+  };
+  const withMessage = (message: string | undefined) =>
+    report([{ ...caseOf("discount-ask", [failing, passing("fine")]), ...(message === undefined ? {} : { message }) }]);
+
+  it("shows the message above the reply in a failure block", () => {
+    const html = renderReportHtml(withMessage("Can I get a discount?"));
+    expect(html).toContain("<p>Customer message</p><pre>Can I get a discount?</pre>");
+    expect(html.indexOf("Customer message")).toBeLessThan(html.indexOf("<p>Reply</p>"));
+    expect(html.match(/Customer message/g)).toHaveLength(1);
+  });
+
+  it("renders without messages and shows no Customer message heading", () => {
+    const html = renderReportHtml(withMessage(undefined), baseline);
+    expect(html).toContain("<details>");
+    expect(html).toContain("<p>Reply</p>");
+    expect(html).not.toContain("Customer message");
+  });
+
+  it("escapes an injected script in the message", () => {
+    const html = renderReportHtml(withMessage(`hi ${INJECTION}`));
+    expect(html).toContain("hi &lt;script&gt;alert(1)&lt;/script&gt;");
+    expect(html.toLowerCase()).not.toContain("<script");
+  });
+
+  it("parses old report files without a message and new ones with it", () => {
+    const old = parseReportRunFile(JSON.parse(JSON.stringify(withMessage(undefined))), "old.json");
+    expect(old.cases[0]?.message).toBeUndefined();
+    const current = parseReportRunFile(JSON.parse(JSON.stringify(withMessage("hello"))), "new.json");
+    expect(current.cases[0]?.message).toBe("hello");
+  });
+});
+
 describe("escapeHtml", () => {
   it("escapes the five special characters", () => {
     expect(escapeHtml(`<a href="x">&'</a>`)).toBe("&lt;a href=&quot;x&quot;&gt;&amp;&#39;&lt;/a&gt;");

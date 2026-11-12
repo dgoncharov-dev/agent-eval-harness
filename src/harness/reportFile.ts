@@ -60,6 +60,8 @@ export const ReportRunSchema = BaselineRunSchema.extend({
   cases: z.array(
     z.object({
       id: z.string(),
+      // Absent in report files written before cases carried their message.
+      message: z.string().optional(),
       attempts: z.array(
         z.object({
           outcome: z.enum(["passed", "failed_checks", "format_error", "refusal", "api_error"]),

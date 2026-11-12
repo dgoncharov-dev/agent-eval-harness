@@ -30,6 +30,7 @@ const judged = { judgeUsage: { inputTokens: 100, outputTokens: 10 } };
 
 const caseA: CaseAggregate = {
   id: "case-a",
+  message: "message a",
   passRate: 2 / 3,
   outcomes: { passed: 2, failed_checks: 1, format_error: 0, refusal: 0, api_error: 0 },
   attempts: [
@@ -48,6 +49,7 @@ const caseA: CaseAggregate = {
 
 const caseB: CaseAggregate = {
   id: "case-b",
+  message: "message b",
   passRate: 0.5,
   outcomes: { passed: 2, failed_checks: 1, format_error: 1, refusal: 0, api_error: 0 },
   attempts: [

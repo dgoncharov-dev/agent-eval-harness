@@ -127,6 +127,20 @@ describe("runAll", () => {
     ]);
   });
 
+  it("puts each case's customer message on its report entry", async () => {
+    const report = await runAll([makeCase("a"), makeCase("b")], { quoteFn: okFn, repeats: 2 });
+    expect(report.cases.map((c) => [c.id, c.message])).toEqual([
+      ["a", "message for a"],
+      ["b", "message for b"],
+    ]);
+  });
+
+  it("keeps the message on a case cut short by the token budget", async () => {
+    const report = await runAll([makeCase("a"), makeCase("b")], { quoteFn: okFn, maxTotalTokens: 50 });
+    expect(report.aborted).toBe(true);
+    expect(report.cases.map((c) => c.message)).toEqual(["message for a"]);
+  });
+
   it("computes passRate across repeats", async () => {
     let calls = 0;
     const quoteFn: QuoteFn = async () => {

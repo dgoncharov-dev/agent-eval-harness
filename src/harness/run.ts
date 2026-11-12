@@ -34,6 +34,8 @@ export type CaseResult = {
 
 export type CaseAggregate = {
   id: string;
+  // The customer message of the case, so a report file is readable without cases/quotes.json.
+  message: string;
   attempts: CaseResult[];
   passRate: number;
   outcomes: Record<Outcome, number>;
@@ -124,10 +126,10 @@ async function judgeAttempt(
   }
 }
 
-function aggregate(id: string, attempts: CaseResult[]): CaseAggregate {
+function aggregate({ id, message }: Case, attempts: CaseResult[]): CaseAggregate {
   const outcomes = emptyOutcomes();
   for (const attempt of attempts) outcomes[attempt.outcome]++;
-  return { id, attempts, passRate: outcomes.passed / attempts.length, outcomes };
+  return { id, message, attempts, passRate: outcomes.passed / attempts.length, outcomes };
 }
 
 export async function runAll(cases: Case[], options: RunOptions = {}): Promise<RunReport> {
@@ -171,11 +173,11 @@ export async function runAll(cases: Case[], options: RunOptions = {}): Promise<R
 
       const moreWork = attempt < repeats - 1 || caseIndex < cases.length - 1;
       if (totalTokens > maxTotalTokens && moreWork) {
-        aggregates.push(aggregate(testCase.id, attempts));
+        aggregates.push(aggregate(testCase, attempts));
         return { cases: aggregates, aborted: true, skipped: cases.slice(caseIndex + 1).map((c) => c.id), ...judgeInfo };
       }
     }
-    aggregates.push(aggregate(testCase.id, attempts));
+    aggregates.push(aggregate(testCase, attempts));
   }
 
   return { cases: aggregates, aborted: false, skipped: [], ...judgeInfo };
